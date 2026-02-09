@@ -26,21 +26,27 @@ async function getDashboardData(query) {
     const airport = getAirport[0];
 
     const data = {
-        city: destination.name,
-        country: destination.country,
-        temperature: weather.temperature,
-        weather: weather.weather_description,
-        airport: airport.name
+        city: destination?.name ?? null,
+        country: destination?.country ?? null,
+        temperature: weather?.temperature ?? null,
+        weather: weather?.weather_description ?? null,
+        airport: airport?.name ?? null
     };
     return data
 
 }
 
 (async () => {
-    const data = await getDashboardData('London')
+    const data = await getDashboardData('Vienna')
     console.log('Dashboard data', data)
-    console.log(`${data.city} is in ${data.country}.\n` +
-        `Today there are ${data.temperature} degrees and the weather is ${data.weather}.\n` +
-        `The main airport is ${data.airport}.\n`)
+    if (data.city && data.country) {
+        console.log(`${data.city} is in ${data.country}.`)
+    }
+    if (data.temperature !== null && data.weather) {
+        console.log(`Today there are ${data.temperature} degrees and the weather is ${data.weather}`)
+    }
+    if (data.airport) {
+        console.log(`The main airport is ${data.airport}`)
+    }
 })()
 
