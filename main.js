@@ -16,37 +16,46 @@ async function fetchJason(url) {
 }
 
 async function getDashboardData(query) {
-    const [getDestination, getWeather, getAirport] = await Promise.all([
-        fetchJason(`http://localhost:3333/destinations?search=${query}`),
-        fetchJason(`http://localhost:3333/weathers?search=${query}`),
-        fetchJason(`http://localhost:3333/airports?search=${query}`)
-    ])
-    const destination = getDestination[0];
-    const weather = getWeather[0];
-    const airport = getAirport[0];
 
-    const data = {
-        city: destination?.name ?? null,
-        country: destination?.country ?? null,
-        temperature: weather?.temperature ?? null,
-        weather: weather?.weather_description ?? null,
-        airport: airport?.name ?? null
-    };
-    return data
+    try {
+        const [getDestination, getWeather, getAirport] = await Promise.all([
+            fetchJason(`http://localhost:3333/destinations?search=${query}`),
+            fetchJason(`http://localhost:3333/weathers?search=${query}`),
+            fetchJason(`http://localhost:3333/airports?search=${query}`)
+        ])
+        const destination = getDestination[0];
+        const weather = getWeather[0];
+        const airport = getAirport[0];
 
+        const data = {
+            city: destination?.name ?? null,
+            country: destination?.country ?? null,
+            temperature: weather?.temperature ?? null,
+            weather: weather?.weather_description ?? null,
+            airport: airport?.name ?? null
+        };
+        return data
+    } catch (error) {
+        throw new Error(`Errore nel recupero dei dati ${error.message}`);
+    }
 }
 
 (async () => {
-    const data = await getDashboardData('Vienna')
-    console.log('Dashboard data', data)
-    if (data.city && data.country) {
-        console.log(`${data.city} is in ${data.country}.`)
+    try {
+        const data = await getDashboardData('Vienna')
+        console.log('Dashboard data', data)
+        if (data.city && data.country) {
+            console.log(`${data.city} is in ${data.country}.`)
+        }
+        if (data.temperature !== null && data.weather) {
+            console.log(`Today there are ${data.temperature} degrees and the weather is ${data.weather}`)
+        }
+        if (data.airport) {
+            console.log(`The main airport is ${data.airport}`)
+        }
+    } catch (error) {
+        console.error('Errore dashboard:', error.message);
     }
-    if (data.temperature !== null && data.weather) {
-        console.log(`Today there are ${data.temperature} degrees and the weather is ${data.weather}`)
-    }
-    if (data.airport) {
-        console.log(`The main airport is ${data.airport}`)
-    }
+
 })()
 
